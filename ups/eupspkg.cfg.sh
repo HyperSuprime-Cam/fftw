@@ -27,9 +27,9 @@ prep(){
 
 config(){
 	cd sp
-	./configure --prefix $PREFIX --disable-fortran --enable-shared --enable-single
+	./configure --prefix $PREFIX --disable-fortran --enable-shared --libdir=$PREFIX/lib --enable-single
 	cd ../dp
-	./configure --prefix $PREFIX --disable-fortran --enable-shared
+	./configure --prefix $PREFIX --disable-fortran --enable-shared --libdir=$PREFIX/lib
 }
 
 

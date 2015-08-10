@@ -1,18 +1,41 @@
 # EupsPkg config file. Sourced by 'eupspkg'
 
-MAKE_INSTALL_TARGETS="-j1 install"
 
-config(){
-	clean_old_install
+prep(){
+	default_prep
+	pwd
+	cd ../
+	pwd
+	cp -r source sp #single precision
+	cp -r source dp #double precision
+	rm -r source/*
+	mv sp source/
+	mv dp source/
+	cp -r source/dp/ups source/
+	cp source/dp/fftw.pc.in source/
 }
 
+config(){
+	cd sp
+	./configure --prefix $PREFIX --disable-fortran --enable-shared --enable-single
+	cd ../dp
+	./configure --prefix $PREFIX --disable-fortran --enable-shared
+}
+
+
 build() {
-	./configure --prefix $PREFIX --disable-fortran --enable-shared $1
-	make && make -j1 install
+	cd sp
+	make
+	cd ../dp
+	make
 }
 
 install()
 {
-	build --enable-single
+	clean_old_install
+	cd sp
+	make install
+	cd ../dp
+	make install
 	install_ups
 }

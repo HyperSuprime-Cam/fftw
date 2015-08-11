@@ -35,6 +35,12 @@ build() {
 	cd ../dp
 	make
 	cd ../
+	#This next bit is here because lsstsw expects to see a _build.log
+	#in the directory. It doesn't seem to be able to handle multiple
+	#subdirectoreis with source in it
+	if [ -f dp/_build.log ]; then
+		cp dp/_build.log ./
+	fi
 }
 
 install()

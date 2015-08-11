@@ -5,10 +5,10 @@ prep(){
 	default_prep
 	#Make directories to hold the source for single and double
 	#precision libraries
-	if [ -d sp ]; then
+	if [ -d "sp" ]; then
 		rm -r sp
 	fi
-	if [  -d dp ]; then
+	if [  -d "dp" ]; then
 		rm -r dp
 	fi
 	mkdir sp dp

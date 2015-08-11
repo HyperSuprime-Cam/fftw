@@ -28,6 +28,7 @@ build() {
 	make
 	cd ../dp
 	make
+	cd ../
 }
 
 install()
@@ -37,5 +38,6 @@ install()
 	make install
 	cd ../dp
 	make install
+	cd ../
 	install_ups
 }

@@ -2,23 +2,26 @@
 
 
 prep(){
-	default_prep
 	#Make directories to hold the source for single and double
 	#precision libraries
 	if [ -d "sp" ]; then
-		rm -r sp
+		rm -rf sp
 	fi
 	if [  -d "dp" ]; then
-		rm -r dp
+		rm -rf dp
+	fi
+	if [ -f "fftw.pc.in" ]; then
+		rm fftw.pc.in
 	fi
 	mkdir sp dp
+	default_prep
 	#Copy the contents into each directory
 	rsync -r --exclude="sp" --exclude="dp" ./ sp/ #single precision
 	rsync -r --exclude="sp" --exclude="dp" ./ dp/ #double precision
 	#delete everything but the sp, dp, and required ups
 	#files/directories
 	rm -rf $(ls |grep -v ^ups$ |grep -v fftw.pc.in |grep -v dp |grep\
-	-v sp|grep -v ^[.]*$)
+	-v sp|grep -v ^[.]*$|grep -v _build.log)
 }
 
 config(){

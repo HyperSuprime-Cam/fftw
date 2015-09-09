@@ -20,7 +20,7 @@ prep(){
 	rsync -r --exclude="sp" --exclude="dp" ./ dp/ #double precision
 	#delete everything but the sp, dp, and required ups
 	#files/directories
-	rm -rf $(ls |grep -v ^ups$ |grep -v fftw.pc.in |grep -v dp |grep\
+	rm -rf $(ls |grep -v ^ups* |grep -v fftw.pc.in |grep -v dp |grep\
 	-v sp|grep -v ^[.]*$|grep -v _build.log)
 }
 

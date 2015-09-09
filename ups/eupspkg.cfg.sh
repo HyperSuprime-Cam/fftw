@@ -16,8 +16,8 @@ prep(){
 	mkdir sp dp
 	default_prep
 	#Copy the contents into each directory
-	rsync -r --exclude="sp" --exclude="dp" ./ sp/ #single precision
-	rsync -r --exclude="sp" --exclude="dp" ./ dp/ #double precision
+	rsync -a --exclude="sp" --exclude="dp" ./ sp/ #single precision
+	rsync -a --exclude="sp" --exclude="dp" ./ dp/ #double precision
 	#delete everything but the sp, dp, and required ups
 	#files/directories
 	rm -rf $(ls |grep -v ^ups* |grep -v fftw.pc.in |grep -v dp |grep\

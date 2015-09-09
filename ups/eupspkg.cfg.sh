@@ -15,9 +15,10 @@ prep(){
 	fi
 	mkdir sp dp
 	default_prep
-	#Copy the contents into each directory
-	rsync -a --exclude="sp" --exclude="dp" ./ sp/ #single precision
-	rsync -a --exclude="sp" --exclude="dp" ./ dp/ #double precision
+	#Copy the contents into each directory, excluding the .git directory.
+	#eupspkg should use the .git directory from the parent to obtain version information.
+	rsync -a --exclude=".git" --exclude="sp" --exclude="dp" ./ sp/ #single precision
+	rsync -a --exclude=".git" --exclude="sp" --exclude="dp" ./ dp/ #double precision
 	#delete everything but the sp, dp, and required ups
 	#files/directories
 	rm -rf $(ls |grep -v ^ups* |grep -v fftw.pc.in |grep -v dp |grep\

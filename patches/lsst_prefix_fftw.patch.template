@@ -1,0 +1,48 @@
+diff -ur fftw-3.3.4/api/fftw3.h fftw-3.3.4/api/fftw3.h
+--- fftw-3.3.4/api/fftw3.h	2014-03-04 10:41:03.000000000 -0800
++++ fftw-3.3.4/api/fftw3.h	2016-04-20 01:37:22.000000000 -0700
+@@ -62,7 +62,7 @@
+ #  define FFTW_DEFINE_COMPLEX(R, C) typedef R C[2]
+ #endif
+ 
+-#define FFTW_CONCAT(prefix, name) prefix ## name
++#define FFTW_CONCAT(prefix, name) $FFTW_FUNC_PREFIX ## prefix ## name
+ #define FFTW_MANGLE_DOUBLE(name) FFTW_CONCAT(fftw_, name)
+ #define FFTW_MANGLE_FLOAT(name) FFTW_CONCAT(fftwf_, name)
+ #define FFTW_MANGLE_LONG_DOUBLE(name) FFTW_CONCAT(fftwl_, name)
+diff -ur fftw-3.3.4/kernel/ifftw.h fftw-3.3.4/kernel/ifftw.h
+--- fftw-3.3.4/kernel/ifftw.h	2014-03-04 10:41:03.000000000 -0800
++++ fftw-3.3.4/kernel/ifftw.h	2016-04-20 01:36:58.000000000 -0700
+@@ -59,7 +59,7 @@
+ #endif
+ 
+ /* determine precision and name-mangling scheme */
+-#define CONCAT(prefix, name) prefix ## name
++#define CONCAT(prefix, name) $FFTW_FUNC_PREFIX ## prefix ## name
+ #if defined(FFTW_SINGLE)
+   typedef float R;
+ # define X(name) CONCAT(fftwf_, name)
+diff -ur fftw-3.3.4/tests/fftw-bench.h fftw-3.3.4/tests/fftw-bench.h
+--- fftw-3.3.4/tests/fftw-bench.h	2013-03-18 05:10:45.000000000 -0700
++++ fftw-3.3.4/tests/fftw-bench.h	2016-04-20 01:38:40.000000000 -0700
+@@ -4,7 +4,7 @@
+ #include "bench-user.h"
+ #include "fftw3.h"
+ 
+-#define CONCAT(prefix, name) prefix ## name
++#define CONCAT(prefix, name) $FFTW_FUNC_PREFIX ## prefix ## name
+ #if defined(BENCHFFT_SINGLE)
+ #define FFTW(x) CONCAT(fftwf_, x)
+ #elif defined(BENCHFFT_LDOUBLE)
+diff -ur fftw-3.3.4/tools/fftw-wisdom.c fftw-3.3.4/tools/fftw-wisdom.c
+--- fftw-3.3.4/tools/fftw-wisdom.c	2014-03-04 10:41:03.000000000 -0800
++++ fftw-3.3.4/tools/fftw-wisdom.c	2016-04-20 01:40:41.000000000 -0700
+@@ -15,7 +15,7 @@
+    extern int threads_ok;
+ #endif
+ 
+-#define CONCAT(prefix, name) prefix ## name
++#define CONCAT(prefix, name) $FFTW_FUNC_PREFIX ## prefix ## name
+ #if defined(BENCHFFT_SINGLE)
+ #define FFTW(x) CONCAT(fftwf_, x)
+ #elif defined(BENCHFFT_LDOUBLE)

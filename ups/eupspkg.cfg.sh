@@ -1,59 +1,48 @@
 # EupsPkg config file. Sourced by 'eupspkg'
 
-
-prep(){
-	#Make directories to hold the source for single and double
-	#precision libraries
-	if [ -d "sp" ]; then
-		rm -rf sp
-	fi
-	if [  -d "dp" ]; then
-		rm -rf dp
-	fi
-	if [ -f "fftw.pc.in" ]; then
-		rm fftw.pc.in
-	fi
-	mkdir sp dp
+prep()
+{
+	#
+	# Clone ourselves into a sp and dp directory (for single and double precision)
+	#
 	default_prep
-	#Copy the contents into each directory, excluding the .git directory.
-	#eupspkg should use the .git directory from the parent to obtain version information.
-	rsync -a --exclude=".git" --exclude="sp" --exclude="dp" ./ sp/ #single precision
-	rsync -a --exclude=".git" --exclude="sp" --exclude="dp" ./ dp/ #double precision
-	#delete everything but the sp, dp, and required ups
-	#files/directories
-	rm -rf $(ls |grep -v ^ups* |grep -v fftw.pc.in |grep -v dp |grep\
-	-v sp|grep -v ^[.]*$|grep -v _build.log)
+
+	rm -rf sp dp
+
+	# Copy everything into a temporary directory outside this one (to
+	# avoid infinite recursion with cp), then move it to sp/ and
+	# duplicate to dp/
+	TMPCOPY=$(mktemp -d -t XXXXX)
+	cp -a . "$TMPCOPY/sp"
+	rm -rf "$TMPCOPY/sp/"{.git,_eupspkg,upstream,patches,ups,_build.log}
+	mv "$TMPCOPY/sp" .
+	cp -a sp dp
+
+	# Clean up the local dir (and try to do it relatively safely)
+	# by removing only files & directories found in the expanded dir
+	ls sp/ | while read FN; do
+		rm -rf "$PWD/$FN"
+	done
 }
 
-config(){
-	cd sp
-	./configure --prefix $PREFIX --disable-fortran --enable-shared --libdir=$PREFIX/lib --enable-single
-	cd ../dp
-	./configure --prefix $PREFIX --disable-fortran --enable-shared --libdir=$PREFIX/lib
+config()
+{
+	( cd sp && ./configure --prefix $PREFIX --disable-fortran --enable-shared --libdir=$PREFIX/lib --enable-single )
+	( cd dp && ./configure --prefix $PREFIX --disable-fortran --enable-shared --libdir=$PREFIX/lib )
 }
 
-
-build() {
-	cd sp
-	make
-	cd ../dp
-	make
-	cd ../
-	#This next bit is here because lsstsw expects to see a _build.log
-	#in the directory. It doesn't seem to be able to handle multiple
-	#subdirectoreis with source in it
-	if [ -f dp/_build.log ]; then
-		cp dp/_build.log ./
-	fi
+build()
+{
+	( cd sp && make )
+	( cd dp && make )
 }
 
 install()
 {
 	clean_old_install
-	cd sp
-	make install
-	cd ../dp
-	make install
-	cd ../
+
+	( cd sp && make install )
+	( cd dp && make install )
+
 	install_ups
 }

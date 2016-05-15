@@ -1,4 +1,5 @@
 # EupsPkg config file. Sourced by 'eupspkg'
+CFLAGS+="-fPIC"
 
 prep()
 {
@@ -27,8 +28,8 @@ prep()
 
 config()
 {
-	( cd sp && ./configure --prefix $PREFIX --disable-fortran --enable-shared --libdir=$PREFIX/lib --enable-single )
-	( cd dp && ./configure --prefix $PREFIX --disable-fortran --enable-shared --libdir=$PREFIX/lib )
+	( cd sp && ./configure --prefix $PREFIX --disable-fortran --libdir=$PREFIX/lib --enable-single CFLAGS="$CFLAGS" )
+	( cd dp && ./configure --prefix $PREFIX --disable-fortran --libdir=$PREFIX/lib CFLAGS="$CFLAGS" )
 }
 
 build()

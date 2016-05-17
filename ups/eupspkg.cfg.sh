@@ -1,5 +1,14 @@
 # EupsPkg config file. Sourced by 'eupspkg'
 
+#
+# Note: FFTW_FUNC_PREFIX and FFTW_LIB_PREFIX environmental variables are
+# defined in the .table file
+#
+
+# FIXME: This is a workaround for lsstsw nor running setup before eupspkg prep
+export FFTW_FUNC_PREFIX="lsst_"
+export FFTW_LIB_PREFIX=""
+
 CFLAGS+="-fPIC"
 
 if [[ $OSTYPE = darwin* ]]; then

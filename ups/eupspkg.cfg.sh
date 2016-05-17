@@ -1,5 +1,7 @@
 # EupsPkg config file. Sourced by 'eupspkg'
 
+CFLAGS+="-fPIC"
+
 if [[ $OSTYPE = darwin* ]]; then
 	LIBEXT=dylib
 	LEADING_UNDERSCORE=_
@@ -39,8 +41,8 @@ prep()
 
 config()
 {
-	( cd sp && ./configure --program-prefix=$FFTW_LIB_PREFIX --prefix $PREFIX --disable-fortran --enable-shared --libdir=$PREFIX/lib --enable-single )
-	( cd dp && ./configure --program-prefix=$FFTW_LIB_PREFIX --prefix $PREFIX --disable-fortran --enable-shared --libdir=$PREFIX/lib )
+	( cd sp && ./configure CFLAGS="$CFLAGS" --program-prefix=$FFTW_LIB_PREFIX --prefix $PREFIX --disable-fortran --libdir=$PREFIX/lib --enable-single )
+	( cd dp && ./configure CFLAGS="$CFLAGS" --program-prefix=$FFTW_LIB_PREFIX --prefix $PREFIX --disable-fortran --libdir=$PREFIX/lib )
 }
 
 build()
@@ -101,7 +103,10 @@ _rename_libraries_linux()
 		rm -f {libfftw3,libfftw3f}.so{,.3}
 
 		# rename static & dynamic libraries
-		for NAME in lib*.{a,la} *.so.*; do
+		if [[ -f lib${FFTW_LIB_PREFIX}fftw3.so.* ]]; then
+			SOGLOB="*.so.*"
+		fi
+		for NAME in lib*.{a,la} $SOGLOB; do
 			mv "$NAME" lib""$FFTW_LIB_PREFIX""${NAME#lib}
 		done
 
@@ -120,15 +125,22 @@ _rename_libraries_linux()
 		)
 
 		# re-establish the symlinks
-		ln -s lib${FFTW_LIB_PREFIX}fftw3.so.*  lib${FFTW_LIB_PREFIX}fftw3.so
-		ln -s lib${FFTW_LIB_PREFIX}fftw3.so.*  lib${FFTW_LIB_PREFIX}fftw3.so.3
-		ln -s lib${FFTW_LIB_PREFIX}fftw3f.so.* lib${FFTW_LIB_PREFIX}fftw3f.so
-		ln -s lib${FFTW_LIB_PREFIX}fftw3f.so.* lib${FFTW_LIB_PREFIX}fftw3f.so.3
+		if [[ -f lib${FFTW_LIB_PREFIX}fftw3.so.* ]]; then
+			ln -s lib${FFTW_LIB_PREFIX}fftw3.so.*  lib${FFTW_LIB_PREFIX}fftw3.so
+			ln -s lib${FFTW_LIB_PREFIX}fftw3.so.*  lib${FFTW_LIB_PREFIX}fftw3.so.3
+		fi
+		if [[ -f lib${FFTW_LIB_PREFIX}fftw3f.so.* ]]; then
+			ln -s lib${FFTW_LIB_PREFIX}fftw3f.so.* lib${FFTW_LIB_PREFIX}fftw3f.so
+			ln -s lib${FFTW_LIB_PREFIX}fftw3f.so.* lib${FFTW_LIB_PREFIX}fftw3f.so.3
+		fi
 
 		# change install names of dynamic libraries
-		for NAME in lib*.so.3; do
-			patchelf --set-soname $NAME $NAME
-		done
+		if [[ -f lib${FFTW_LIB_PREFIX}fftw3f.so ]]; then
+			for NAME in lib*.so.3; do
+				patchelf --set-soname $NAME $NAME
+			done
+		fi
+
 	)
 
 	# fix library names in .cfg files
@@ -149,7 +161,7 @@ _fixup_headers()
 		done
 		echo "/* ----------------- */"
 
-		nm "$PREFIX"/lib/lib${FFTW_LIB_PREFIX}fftw3.$LIBEXT | grep " ${LEADING_UNDERSCORE}${FFTW_FUNC_PREFIX}" | grep -E " (S|T) " | cut -d ' ' -f 3 | \
+		nm "$PREFIX"/lib/lib${FFTW_LIB_PREFIX}fftw3.a | grep " ${LEADING_UNDERSCORE}${FFTW_FUNC_PREFIX}" | grep -E " (S|T) " | cut -d ' ' -f 3 | \
 			while read SYMBOL; do
 				FUNC=${SYMBOL#${LEADING_UNDERSCORE}${FFTW_FUNC_PREFIX}fftw_}
 
@@ -188,6 +200,6 @@ install()
 
 	install_ups
 
-	_rename_libraries
+	test ! -z "$FFTW_LIB_PREFIX" && _rename_libraries
 	_fixup_headers
 }

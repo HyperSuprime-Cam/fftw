@@ -4,4 +4,4 @@ envPrepend(DYLD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)
 envPrepend(LSST_LIBRARY_PATH, ${PRODUCT_DIR}/lib)
 
 envSet(FFTW_FUNC_PREFIX, "lsst_")
-envSet(FFTW_LIB_PREFIX, "lsst-")
+envSet(FFTW_LIB_PREFIX, "")

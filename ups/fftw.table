@@ -3,5 +3,12 @@ envPrepend(LD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)
 envPrepend(DYLD_LIBRARY_PATH, ${PRODUCT_DIR}/lib)
 envPrepend(LSST_LIBRARY_PATH, ${PRODUCT_DIR}/lib)
 
+#
+# NOTE: These have been set in eupspkg.cfg.sh as well to work around an
+# lsstsw issue with the product not being setup-ed when `eupspkg prep` is
+# run.  They should be removed from there once that's dealt with. In the
+# meantime, make sure they're kept in sync!!!
+#
 envSet(FFTW_FUNC_PREFIX, "lsst_")
 envSet(FFTW_LIB_PREFIX, "")
+envSet(FFTW_SHARED, 0)

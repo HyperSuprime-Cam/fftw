@@ -1,15 +1,22 @@
 # EupsPkg config file. Sourced by 'eupspkg'
 
 #
-# Note: FFTW_FUNC_PREFIX and FFTW_LIB_PREFIX environmental variables are
+# Note: FFTW_FUNC_PREFIX, FFTW_LIB_PREFIX, and FFTW_SHARED environmental variables are
 # defined in the .table file
 #
-
-# FIXME: This is a workaround for lsstsw nor running setup before eupspkg prep
+# FIXME: We define them here again (make sure they're kept in sync!!).  This
+# is a workaround for lsstsw nor running setup before eupspkg prep.  Remove
+# it once the lsstsw issue is fixed.
+#
 export FFTW_FUNC_PREFIX="lsst_"
 export FFTW_LIB_PREFIX=""
+export FFTW_SHARED=0
 
-CFLAGS+="-fPIC"
+if [[ $FFTW_SHARED == 1 ]]; then
+	ENABLE_SHARED="--enable-shared"
+else
+	CFLAGS+="-fPIC"
+fi
 
 if [[ $OSTYPE = darwin* ]]; then
 	LIBEXT=dylib
@@ -50,8 +57,8 @@ prep()
 
 config()
 {
-	( cd sp && ./configure CFLAGS="$CFLAGS" --program-prefix=$FFTW_LIB_PREFIX --prefix $PREFIX --disable-fortran --libdir=$PREFIX/lib --enable-single )
-	( cd dp && ./configure CFLAGS="$CFLAGS" --program-prefix=$FFTW_LIB_PREFIX --prefix $PREFIX --disable-fortran --libdir=$PREFIX/lib )
+	( cd sp && ./configure CFLAGS="$CFLAGS" $ENABLE_SHARED --program-prefix=$FFTW_LIB_PREFIX --prefix $PREFIX --disable-fortran --libdir=$PREFIX/lib --enable-single )
+	( cd dp && ./configure CFLAGS="$CFLAGS" $ENABLE_SHARED --program-prefix=$FFTW_LIB_PREFIX --prefix $PREFIX --disable-fortran --libdir=$PREFIX/lib )
 }
 
 build()
